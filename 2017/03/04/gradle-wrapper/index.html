@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang=>
+  <head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  
+    <link rel="icon" href="https://avatars1.githubusercontent.com/u/2307321?s=40&v=4">
+  
+    
+  <title>gradle-wrapper | 王小涛 - 安静，丰富，有趣</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/lib/jquery.fancybox.min.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <header>
+  <div class="header-container">
+    <a class="logo" href="/">
+      <span>王小涛 - 安静，丰富，有趣</span>
+    </a>
+    <ul class="right-header">
+      
+        <li class="nav-item">
+          
+            <a href="/" class="item-link">首页</a>
+          
+        </li>
+      
+        <li class="nav-item">
+          
+            <a href="/about" class="item-link">关于</a>
+          
+        </li>
+      
+        <li class="nav-item">
+          
+            <a href="/archives" class="item-link">归档</a>
+          
+        </li>
+      
+        <li class="nav-item">
+          
+            <a href="/tags" class="item-link">标签</a>
+          
+        </li>
+      
+    </ul>
+  </div>
+</header>
+
+  <main id="post">
+  <div class="content">
+    <article>
+        <section class="content markdown-body">
+          <h1>gradle-wrapper</h1>
+          <div class="post-meta">
+            <i class="fa fa-calendar" aria-hidden="true"></i> <time>2017/03/04</time>
+            
+              | <i class="fa fa-folder-open-o" aria-hidden="true"></i> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/gradle/">gradle</a>
+  </div>
+
+
+
+            
+            
+              | 
+                  <i class="fa fa-tags" aria-hidden="true"></i>
+                
+               
+  <a href="/tags/#gradle" class="tag">gradle</a>
+
+  <a href="/tags/#gradle-wrapper" class="tag">gradle-wrapper</a>
+
+
+            
+          </div>
+          <blockquote>
+<p>gradle wrapper 的 wrapper 我认为可以作为“容器”。它封装了所需要的构建工具的版本和配置信息，基于 JVM 跨平台运行。一次发布(distribution, dist for short)，不同开发者在不同平台上运行，都能自动初始化相同环境、构建相同的结果，极大地减少了对开发者环境配置的依赖。这与容器设计的思想是相通的。</p>
+</blockquote>
+<h2 id="1-发布的-gradle-wrapper-文件组织结构"><a href="#1-发布的-gradle-wrapper-文件组织结构" class="headerlink" title="1. 发布的 gradle wrapper 文件组织结构"></a>1. 发布的 gradle wrapper 文件组织结构</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── gradle</span><br><span class="line">│   └── wrapper</span><br><span class="line">│   ├── gradle-wrapper.jar</span><br><span class="line">│   └── gradle-wrapper.properties</span><br><span class="line">├── gradlew</span><br><span class="line">├── gradlew.bat</span><br></pre></td></tr></table></figure>
+<p>gradlew / gradlew.bat 分别是 shell 和 windows 批处理运行脚本。命令行运行脚本，会依次检查 java、初始化运行：</p>
+<ol>
+<li>设置工作目录，添加 gradle-wrapper.jar 到 CLASSPATH</li>
+<li>检测 JAVA_HOME，获取 java</li>
+<li>执行下载、安装 gradle，并运行：<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -classpath ./gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>gradle-wrapper.properties 配置了 gradle 发布版本和本地安装目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#Mon Dec 28 10:00:20 PST 2015</span><br><span class="line">distributionBase=GRADLE_USER_HOME</span><br><span class="line">distributionPath=wrapper/dists</span><br><span class="line">zipStoreBase=GRADLE_USER_HOME</span><br><span class="line">zipStorePath=wrapper/dists</span><br><span class="line">distributionUrl=https\://services.gradle.org/distributions/gradle-2.14.1-all.zip</span><br></pre></td></tr></table></figure>
+<p>distributionBase / zipStoreBase 仅支持2个枚举字符串常量：</p>
+<ul>
+<li><em>GRADLE_USER_HOME</em> 使用当前用户的 ~/.gradle/ 作为本地安装目录</li>
+<li><em>PROJECT</em> 使用当前工程的 rootDir 作为本地安装目录</li>
+</ul>
+<p>同时，开发者也可以在系统环境变量里添加 <em>GRADLE_USER_HOME</em>，自定义本地安装目录。</p>
+<h2 id="2-gradlew-如何查找、下载目标版本的-gradle"><a href="#2-gradlew-如何查找、下载目标版本的-gradle" class="headerlink" title="2. gradlew 如何查找、下载目标版本的 gradle"></a>2. gradlew 如何查找、下载目标版本的 gradle</h2><p>gradle-wrapper.jar 源码[^1] 很简单，主要流程如下：<br><img src="https://raw.githubusercontent.com/wtao901231/UML/master/gitbook/gradle-learning/export/gradlew.jpg" alt="gradlew-run-GradleWrapperMain"></p>
+<ol>
+<li>查找本地安装根目录</li>
+<li><strong>下载状态检查(markerFile .zip.ok) 和文件锁(.zip.lck)并发控制</strong></li>
+<li>获取zip包下载到、和解压到路径 distZip / distDir</li>
+<li>下载、解压安装，设置运行权限</li>
+<li>启动构建</li>
+</ol>
+<h3 id="查找本地安装目录优先级"><a href="#查找本地安装目录优先级" class="headerlink" title="查找本地安装目录优先级"></a>查找本地安装目录优先级</h3><ol>
+<li>gradle-wrapper.properties 配置 distributionBase=<em>GRADLE_USER_HOME</em> | <em>PROJECT</em></li>
+<li>环境变量 $GRADLE_USER_HOME/</li>
+<li>系统变量 ${gradle.user.home}/</li>
+<li>系统变量 ${user.home}/.gradle/</li>
+</ol>
+<h3 id="获取zip包下载到、和解压到路径-distZip-distDir"><a href="#获取zip包下载到、和解压到路径-distZip-distDir" class="headerlink" title="获取zip包下载到、和解压到路径 distZip / distDir"></a>获取zip包下载到、和解压到路径 distZip / distDir</h3><p>distXXX 路径由下面几段组成：</p>
+<ol>
+<li>gradle 本地安装目录 gradleUserHome</li>
+<li>安装路径 path</li>
+<li>版本 hash 路径 rootDir</li>
+<li>安装包名 baseName / 解压路径 distName</li>
+</ol>
+<p>以上文 gradle-wrapper.properties 配置为例：</p>
+<h4 id="gradleUserHome"><a href="#gradleUserHome" class="headerlink" title="gradleUserHome"></a>gradleUserHome</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">distributionBase=GRADLE_USER_HOME</span><br></pre></td></tr></table></figure>
+<p>base 类型为 <em>GRADLE_USER_HOME</em>，使用默认安装目录：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.gradle/</span><br></pre></td></tr></table></figure></p>
+<h4 id="path"><a href="#path" class="headerlink" title="path"></a>path</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">distributionPath=wrapper/dists</span><br></pre></td></tr></table></figure>
+<p>配置使用了默认路径 wrapper/dists：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.gradle/wrapper/dists/</span><br></pre></td></tr></table></figure></p>
+<h4 id="版本-hash-路径-rootDir"><a href="#版本-hash-路径-rootDir" class="headerlink" title="版本 hash 路径 rootDir"></a>版本 hash 路径 rootDir</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">distributionUrl=https\://services.gradle.org/distributions/gradle-2.14.1-all.zip</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">distName = <span class="string">'gradle-2.14.1-all'</span></span><br><span class="line">baseName = <span class="string">'gradle-2.14.1-all.zip'</span></span><br><span class="line">distHash = base32_encode(hash(distributionUrl)) // <span class="string">'8bnwg5hd3w55iofp58khbp6yv'</span></span><br></pre></td></tr></table></figure>
+<p><code>相同版本、不同发布方 hash 不同，确保运行路径独立。</code></p>
+<h4 id="最终zip包下载到、和解压到路径-distZip-distDir"><a href="#最终zip包下载到、和解压到路径-distZip-distDir" class="headerlink" title="最终zip包下载到、和解压到路径 distZip / distDir"></a>最终zip包下载到、和解压到路径 distZip / distDir</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">distZip=~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1-all.zip</span><br><span class="line">distDir=~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/</span><br></pre></td></tr></table></figure>
+<p>另外，下载过程中产生的中间文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1-all.zip.lck</span><br><span class="line">~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1-all.zip.part</span><br><span class="line">~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1-all.zip.ok</span><br></pre></td></tr></table></figure></p>
+<p>.zip.lck 用于文件锁，控制并发下载。.zip.part 表示下载中，.zip.ok 表示下载成功。</p>
+<p>最终解压文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/.gradle/wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1</span><br></pre></td></tr></table></figure></p>
+<p>当 markFile .zip.ok 标志下载成功后，distDir 检测解压后子文件夹，有且只有一个。命名不一定和 distName 相同。</p>
+<p>最终安装目录：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">└── wrapper</span><br><span class="line">└── dists</span><br><span class="line">└── gradle-2.14.1-all</span><br><span class="line">└── 8bnwg5hd3w55iofp58khbp6yv</span><br><span class="line">├── gradle-2.14.1</span><br><span class="line">│   ├── LICENSE</span><br><span class="line">│   ├── NOTICE</span><br><span class="line">│   ├── bin</span><br><span class="line">│   ├── changelog.txt</span><br><span class="line">│   ├── docs</span><br><span class="line">│   ├── getting-started.html</span><br><span class="line">│   ├── init.d</span><br><span class="line">│   ├── lib</span><br><span class="line">│   ├── media</span><br><span class="line">│   ├── samples</span><br><span class="line">│   └── src</span><br><span class="line">├── gradle-2.14.1-all.zip</span><br><span class="line">├── gradle-2.14.1-all.zip.lck</span><br><span class="line">└── gradle-2.14.1-all.zip.ok</span><br></pre></td></tr></table></figure></p>
+<p>gradle 构建，命令行：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./wrapper/dists/gradle-2.14.1-all/8bnwg5hd3w55iofp58khbp6yv/gradle-2.14.1/gradle-2.14.1/bin/gradle</span><br></pre></td></tr></table></figure></p>
+<p>或者 gradlew 运行调用 lib：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * java -classpath gradleHome/lib/gradle-launcher-2.14.1.jar org.gradle.launcher.GradleMain &lt;args&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BootstrapMainStarter</span> </span>&#123;</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(String[] args, File gradleHome)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">  File gradleJar = findLauncherJar(gradleHome);</span><br><span class="line">  URLClassLoader contextClassLoader = <span class="keyword">new</span> URLClassLoader(<span class="keyword">new</span> URL[] &#123;</span><br><span class="line">   gradleJar.toURI().toURL()</span><br><span class="line">  &#125;, ClassLoader.getSystemClassLoader().getParent());</span><br><span class="line">  Thread.currentThread().setContextClassLoader(contextClassLoader);</span><br><span class="line">  Class &lt; ? &gt; mainClass = contextClassLoader.loadClass(<span class="string">"org.gradle.launcher.GradleMain"</span>);</span><br><span class="line">  Method mainMethod = mainClass.getMethod(<span class="string">"main"</span>, String[].class);</span><br><span class="line">  mainMethod.invoke(<span class="keyword">null</span>, <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">   args</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">if</span> (contextClassLoader <span class="keyword">instanceof</span> Closeable) &#123;</span><br><span class="line">   ((Closeable) contextClassLoader).close();</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="See-Also"><a href="#See-Also" class="headerlink" title="See Also"></a>See Also</h1><p>[1] GitHub gradle wrapper main/src, <a href="https://github.com/gradle/gradle/blob/master/subprojects/wrapper/src/main/java/org/gradle/wrapper/" target="_blank" rel="noopener">https://github.com/gradle/gradle/blob/master/subprojects/wrapper/src/main/java/org/gradle/wrapper/</a></p>
+
+        </section>
+    </article>
+    
+        
+  </div>
+  <aside>
+    
+    <div class="toc-container">
+        <h1>目录</h1>
+        <div class="content">
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-发布的-gradle-wrapper-文件组织结构"><span class="toc-number">1.</span> <span class="toc-text">1. 发布的 gradle wrapper 文件组织结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-gradlew-如何查找、下载目标版本的-gradle"><span class="toc-number">2.</span> <span class="toc-text">2. gradlew 如何查找、下载目标版本的 gradle</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#查找本地安装目录优先级"><span class="toc-number">2.1.</span> <span class="toc-text">查找本地安装目录优先级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取zip包下载到、和解压到路径-distZip-distDir"><span class="toc-number">2.2.</span> <span class="toc-text">获取zip包下载到、和解压到路径 distZip / distDir</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#gradleUserHome"><span class="toc-number">2.2.1.</span> <span class="toc-text">gradleUserHome</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#path"><span class="toc-number">2.2.2.</span> <span class="toc-text">path</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#版本-hash-路径-rootDir"><span class="toc-number">2.2.3.</span> <span class="toc-text">版本 hash 路径 rootDir</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#最终zip包下载到、和解压到路径-distZip-distDir"><span class="toc-number">2.2.4.</span> <span class="toc-text">最终zip包下载到、和解压到路径 distZip / distDir</span></a></li></ol></li></ol></li></ol><li class="toc-item toc-level-1"><a class="toc-link" href="#See-Also"><span class="toc-number"></span> <span class="toc-text">See Also</span></a>
+        </li></div>
+    </div>
+    
+  </aside>
+</main>
+
+
+
+  <footer>
+  <div class="copyright">
+    <div>
+      &copy; 2019 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a>&nbsp
+    </div>
+    <div>
+      Theme by <a href="https://github.com/lewis-geek/hexo-theme-Aath" target="_blank">Aath</a>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="/lib/in-view.min.js"></script>
+<script src="/lib/lodash.min.js"></script>
+<script>
+  var isDown = true
+  var oldY = 0
+  inView.offset(50)
+
+  document.body.addEventListener('touchstart', function(){});
+  
+  window.addEventListener('scroll', _.throttle(e => {
+    var currentY = window.scrollY
+    if((oldY - currentY) < 0) {
+      isDown = true
+    } else {
+      isDown = false
+    }
+    oldY = currentY
+  }, 250))
+
+  $("article img").each(function() {
+      var strA = "<a data-fancybox='gallery' href='" + this.src + "'></a>";
+      $(this).wrapAll(strA);
+  });
+
+  $('.toc-link').each(function() {
+      var href = $(this).attr("href");
+      
+      inView(href).on('exit', () => {
+        if (isDown) {
+          handleActive(href)
+        }
+      })
+
+      inView(href).on('enter', () => {
+        if (!isDown) {
+          handleActive(href)
+        }
+      })
+
+      this.onclick = function(e) {
+        var pos = $(href).offset().top - 10;
+        $("html,body").animate({scrollTop: pos}, 300);
+        setTimeout(() => {
+          handleActive(href)
+        }, 350)
+        return false
+      }
+  })
+
+  function handleActive(href) {
+    document.querySelectorAll('.toc-link').forEach(elm => {
+      elm.classList.remove('active')
+    })
+    document.querySelector(".toc [href='"+ href +"']").classList.add('active')
+  }
+</script>
+<script src="/lib/jquery.fancybox.min.js"></script>
+
+
+</body>
+</html>
